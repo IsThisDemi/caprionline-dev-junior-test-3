@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\MovieRepository;
+use App\Repository\MovieGenreRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,6 +13,7 @@ class MoviesController extends AbstractController
 {
     public function __construct(
         private MovieRepository $movieRepository,
+        private MovieGenreRepository $movieGenreRepository,
         private SerializerInterface $serializer
     ) {}
 
@@ -40,6 +42,15 @@ class MoviesController extends AbstractController
 
         $data = $this->serializer->serialize($movies, "json", ["groups" => "default"]);
 
+        return new JsonResponse($data, json: true);
+    }
+
+    //Filter by genre
+    #[Route('/movies/genre/{genreId}/{sortBy}/{orderBy}', methods: ['GET'], requirements: ['sortBy' => 'recently_uploaded|release_date|rating', 'orderBy' => 'asc|desc'])]
+    public function filterByGenre(int $genreId, string $sortBy, string $orderBy): JsonResponse
+    {
+        $movies = $this->movieGenreRepository->findByGenreId($genreId, $orderBy, $sortBy);
+        $data = $this->serializer->serialize($movies, "json", ["groups" => "default"]);
         return new JsonResponse($data, json: true);
     }
 }

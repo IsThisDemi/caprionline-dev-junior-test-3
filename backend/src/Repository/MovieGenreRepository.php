@@ -45,4 +45,29 @@ class MovieGenreRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    //Get list of films having the genre
+    public function findByGenreId(int $genreId, string $orderBy, string $sortBy): array
+    {
+        $sortFilter = '';
+        if ($sortBy === 'recently_uploaded') {
+            $sortFilter = 'id';
+        } elseif ($sortBy === 'release_date') {
+            $sortFilter = 'releaseDate';
+        } elseif ($sortBy === 'rating') {
+            $sortFilter = 'rating';
+        }
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQueryBuilder()
+            ->select('mg.id as movieGenreId, m.id, m.title, g.name, m.imageUrl, m.plot, m.year, m.releaseDate, m.duration, m.rating, m.wikipediaUrl')
+            ->from('App\Entity\MovieGenre', 'mg')
+            ->innerJoin('mg.movie', 'm')
+            ->innerJoin('mg.genre', 'g')
+            ->where('mg.genre = :id')
+            ->orderBy('m.' . $sortFilter, $orderBy)
+            ->setParameter('id', $genreId);
+            
+        return $query->getQuery()->getResult();
+    }
 }

@@ -23,7 +23,7 @@ const App = props => {
   return (
     <Layout>
       <Heading />
-
+      <OrderBy onChange={fetchMovies} />
       <MovieList loading={loading}>
         {movies.map((item, key) => (
           <MovieItem key={key} {...item} />
@@ -56,6 +56,39 @@ const Heading = props => {
     </div>
   );
 };
+
+const OrderBy = props => {
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between mb-8 lg:mb-16">
+      <div className="flex items-center mb-4 sm:mb-0">
+        <span className="font-light text-gray-900 dark:text-white sm:text-m">
+          Sort by:
+        </span>
+
+        <select
+          className="ml-2 rounded-md shadow-md border-slate-200 text-gray-500 sm:text-m dark:text-gray-400"
+          onChange={(e) => props.onChange(e.target.value)}
+        >
+          <option value="recent">Recently added</option>
+          <option value="release">Release Date</option>
+          <option value="rating">Rating</option>
+        </select>
+      </div>
+
+      <div className="flex items-center">
+        <span className="font-light text-gray-900 dark:text-white sm:text-m">Order:</span>
+
+        <select
+          className="ml-2 rounded-md shadow-md border-slate-200 text-gray-500 sm:text-m dark:text-gray-400"
+          onChange={(e) => props.onChange(e.target.value)}
+        >
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
+    </div>
+  );
+}
 
 const MovieList = props => {
   if (props.loading) {

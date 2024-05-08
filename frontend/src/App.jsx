@@ -4,11 +4,23 @@ import { Button, Rating, Spinner } from 'flowbite-react';
 const App = props => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [orderBy, setOrderBy] = useState('asc');
+  const [sortBy, setSortBy] = useState('recently_uploaded');
+
+  const updateOrder = (e) => {
+    const order = e.target.value;
+    setOrderBy(order);
+  }
+
+  const updateSort = (e) => {
+    const sort = e.target.value;
+    setSortBy(sort);
+  }
 
   const fetchMovies = () => {
     setLoading(true);
-
-    return fetch('http://localhost:8000/movies')
+    console.log(`http://localhost:8000/movies/${sortBy}/${orderBy}`);
+    return fetch(`http://localhost:8000/movies/${sortBy}/${orderBy}`)
       .then(response => response.json())
       .then(data => {
         setMovies(data);
@@ -18,12 +30,12 @@ const App = props => {
 
   useEffect(() => {
     fetchMovies();
-  }, []);
+  }, [orderBy, sortBy]);
 
   return (
     <Layout>
       <Heading />
-      <OrderBy onChange={fetchMovies} />
+      <OrderBy updateOrder={updateOrder} updateSort={updateSort}/>
       <MovieList loading={loading}>
         {movies.map((item, key) => (
           <MovieItem key={key} {...item} />
@@ -57,7 +69,7 @@ const Heading = props => {
   );
 };
 
-const OrderBy = props => {
+const OrderBy = ({updateOrder, updateSort}) => {
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between mb-8 lg:mb-16">
       <div className="flex items-center mb-4 sm:mb-0">
@@ -67,10 +79,10 @@ const OrderBy = props => {
 
         <select
           className="ml-2 rounded-md shadow-md border-slate-200 text-gray-500 sm:text-m dark:text-gray-400"
-          onChange={(e) => props.onChange(e.target.value)}
+          onChange={updateSort}
         >
-          <option value="recent">Recently added</option>
-          <option value="release">Release Date</option>
+          <option value="recently_uploaded">Recently added</option>
+          <option value="release_date">Release Date</option>
           <option value="rating">Rating</option>
         </select>
       </div>
@@ -80,7 +92,7 @@ const OrderBy = props => {
 
         <select
           className="ml-2 rounded-md shadow-md border-slate-200 text-gray-500 sm:text-m dark:text-gray-400"
-          onChange={(e) => props.onChange(e.target.value)}
+          onChange={updateOrder}
         >
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
